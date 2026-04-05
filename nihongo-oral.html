@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nihongo · Parler Japonais</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@300;400;700&family=Playfair+Display:ital,wght@0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d14;
+  --surface: #13131f;
+  --card: #1a1a2c;
+  --border: #2a2a40;
+  --accent: #e8613a;
+  --accent2: #f0a500;
+  --blue: #4d9de0;
+  --green: #3cc47c;
+  --text: #e8e6f0;
+  --muted: #6b6880;
+  --soft: #b8b4cc;
+  --ruby: #e05a8a;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* NOISE TEXTURE */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* HEADER */
+header {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(13,13,20,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 58px;
+  display: flex; align-items: center; gap: 20px;
+}
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+.logo span { color: var(--text); font-style: italic; }
+.header-nav {
+  display: flex; gap: 4px; margin-left: 24px;
+}
+.hnav {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  color: var(--muted);
+  transition: all 0.2s;
+  border: 1px solid transparent;
+  letter-spacing: 0.5px;
+}
+.hnav:hover { color: var(--text); border-color: var(--border); }
+.hnav.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+.xp-chip {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px; padding: 5px 14px;
+  font-size: 0.72rem; color: var(--accent2);
+}
+.streak { color: var(--accent); font-size: 0.8rem; }
+
+/* MAIN */
+.page { position: relative; z-index: 1; }
+.container { max-width: 900px; margin: 0 auto; padding: 32px 20px; }
+
+/* ===== WORD CARD ===== */
+.word-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.word-card::after {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(232,97,58,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.word-category {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--muted);
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.word-category::before {
+  content: '';
+  display: inline-block;
+  width: 20px; height: 1px;
+  background: var(--accent);
+}
+
+/* BIG WORD */
+.word-main {
+  display: flex; align-items: flex-end; gap: 20px;
+  margin-bottom: 12px; flex-wrap: wrap;
+}
+.word-jp {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+.word-meaning {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  color: var(--muted);
+  font-style: italic;
+  padding-bottom: 6px;
+}
+
+/* SYLLABLE BREAKDOWN */
+.syllable-row {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin: 20px 0;
+}
+.syllable {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.syllable:hover { transform: translateY(-3px); }
+.syl-char {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  padding: 10px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  min-width: 54px;
+  text-align: center;
+  transition: all 0.15s;
+  position: relative;
+}
+.syllable:hover .syl-char {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.syllable.playing .syl-char {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(232,97,58,0.25);
+}
+.syl-roma {
+  font-size: 0.72rem;
+  color: var(--soft);
+  letter-spacing: 1px;
+}
+.syl-tip {
+  font-size: 0.6rem;
+  color: var(--accent2);
+  text-align: center;
+  max-width: 60px;
+}
+
+/* PRONUNCIATION GUIDE */
+.pronunc-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin: 16px 0;
+  border-left: 3px solid var(--accent);
+}
+.pronunc-block .label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.pronunc-block p {
+  font-size: 0.82rem;
+  color: var(--soft);
+  line-height: 1.7;
+}
+.pronunc-block strong { color: var(--text); }
+.phonetic {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  color: var(--accent2);
+  font-style: italic;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* AUDIO BTNS */
+.audio-row {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  margin-top: 20px;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 18px; border-radius: 8px;
+  border: 1px solid var(--border);
+  cursor: pointer; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem; transition: all 0.18s;
+  background: var(--surface); color: var(--text);
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn-play { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-play:hover { background: #d4522e; border-color: #d4522e; color: #fff; }
+.btn-slow { border-color: var(--blue); color: var(--blue); }
+.btn-slow:hover { background: var(--blue); color: #fff; }
+.speed-label {
+  font-size: 0.68rem; color: var(--muted);
+  display: flex; align-items: center; gap: 6px;
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+input[type=range] {
+  width: 80px; accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* NAV ARROWS */
+.word-nav {
+  display: flex; gap: 10px; align-items: center;
+  margin-top: 20px;
+}
+.nav-btn {
+  padding: 10px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  transition: all 0.18s;
+}
+.nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+.nav-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.nav-btn.primary:hover { background: #d4522e; }
+.nav-btn:disabled { opacity: 0.3; cursor: default; }
+.word-counter { font-size: 0.72rem; color: var(--muted); margin-left: auto; }
+.dot-row { display: flex; gap: 5px; align-items: center; }
+.dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--border); cursor: pointer; transition: all 0.2s;
+}
+.dot.done { background: var(--green); }
+.dot.active { background: var(--accent); transform: scale(1.4); }
+
+/* ===== SENTENCE STRUCTURE ===== */
+.structure-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 20px;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.section-sub { font-size: 0.76rem; color: var(--muted); margin-bottom: 24px; }
+
+/* SENTENCE BUILDER */
+.sentence-jp {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+.sentence-phonetic {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  color: var(--accent2);
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+.sentence-fr { color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; }
+
+/* STRUCTURE DIAGRAM */
+.struct-diagram {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  align-items: flex-start; margin: 16px 0;
+}
+.struct-block {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 4px;
+}
+.struct-word {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: 1.2rem;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.struct-word:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.struct-role {
+  font-size: 0.58rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-align: center;
+}
+.struct-arrow {
+  font-size: 1.4rem;
+  color: var(--border);
+  padding-top: 12px;
+}
+/* Color coding */
+.role-sujet { background: rgba(77,157,224,0.12); border-color: rgba(77,157,224,0.4); color: var(--blue); }
+.role-sujet .struct-role { color: var(--blue); }
+.role-particule { background: rgba(240,165,0,0.1); border-color: rgba(240,165,0,0.3); color: var(--accent2); }
+.role-particule .struct-role { color: var(--accent2); }
+.role-objet { background: rgba(60,196,124,0.1); border-color: rgba(60,196,124,0.3); color: var(--green); }
+.role-objet .struct-role { color: var(--green); }
+.role-verbe { background: rgba(232,97,58,0.15); border-color: rgba(232,97,58,0.4); color: var(--accent); }
+.role-verbe .struct-role { color: var(--accent); }
+.role-contexte { background: rgba(224,90,138,0.1); border-color: rgba(224,90,138,0.3); color: var(--ruby); }
+.role-contexte .struct-role { color: var(--ruby); }
+.role-fin { background: rgba(107,104,128,0.2); border-color: var(--border); color: var(--soft); }
+.role-fin .struct-role { color: var(--muted); }
+
+.struct-legend {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  margin-top: 14px; padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.legend-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.65rem; color: var(--muted);
+}
+.legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+.struct-explain {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-top: 14px;
+  font-size: 0.8rem;
+  color: var(--soft);
+  line-height: 1.7;
+}
+.struct-explain strong { color: var(--text); }
+.struct-explain .highlight { color: var(--accent2); }
+
+/* ===== THEMATIC VOCAB ===== */
+.vocab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.vocab-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.vocab-item:hover { border-color: var(--accent); transform: translateY(-2px); }
+.vocab-item.playing { border-color: var(--accent); background: rgba(232,97,58,0.08); }
+.vocab-jp { font-family: 'Zen Kaku Gothic New', sans-serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
+.vocab-roma { font-size: 0.72rem; color: var(--accent2); font-style: italic; margin-bottom: 2px; }
+.vocab-fr { font-size: 0.75rem; color: var(--muted); }
+.vocab-phonetic {
+  font-size: 0.65rem; color: var(--soft);
+  margin-top: 6px; padding-top: 6px;
+  border-top: 1px solid var(--border);
+  line-height: 1.5;
+}
+.play-icon {
+  position: absolute; top: 12px; right: 12px;
+  font-size: 0.9rem; color: var(--muted);
+  transition: color 0.15s;
+}
+.vocab-item:hover .play-icon { color: var(--accent); }
+
+/* CATEGORY TABS */
+.cat-tabs {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.cat-tab {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  transition: all 0.18s;
+  background: var(--surface);
+}
+.cat-tab:hover { color: var(--text); border-color: var(--soft); }
+.cat-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ===== QUIZ ===== */
+.quiz-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px;
+  text-align: center;
+}
+.quiz-q-label { font-size: 0.62rem; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+.quiz-big {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-size: 3rem; font-weight: 700;
+  margin-bottom: 8px;
+}
+.quiz-phonetic { font-size: 0.85rem; color: var(--accent2); font-style: italic; margin-bottom: 28px; }
+.quiz-options {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; max-width: 480px; margin: 0 auto 20px;
+}
+.quiz-opt {
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  text-align: center;
+  transition: all 0.18s;
+  background: var(--surface); color: var(--text);
+}
+.quiz-opt:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); background: rgba(232,97,58,0.08); }
+.quiz-opt.correct { background: rgba(60,196,124,0.15); border-color: var(--green); color: var(--green); font-weight: 600; }
+.quiz-opt.wrong { background: rgba(232,97,58,0.1); border-color: var(--accent); color: var(--accent); }
+.quiz-opt:disabled { cursor: default; }
+.quiz-feedback { min-height: 32px; font-size: 0.85rem; transition: opacity 0.3s; }
+.quiz-feedback.ok { color: var(--green); }
+.quiz-feedback.ko { color: var(--accent); }
+.quiz-progress {
+  display: flex; gap: 4px; justify-content: center;
+  margin-bottom: 24px;
+}
+.qp-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+.qp-dot.done-ok { background: var(--green); }
+.qp-dot.done-ko { background: var(--accent); }
+.qp-dot.cur { background: var(--accent2); transform: scale(1.4); }
+
+/* SCORE END */
+.score-end { padding: 20px; }
+.score-end .big { font-size: 3.5rem; margin-bottom: 8px; }
+.score-end h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin-bottom: 6px; }
+.score-end p { color: var(--muted); font-size: 0.82rem; margin-bottom: 20px; }
+.xp-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(240,165,0,0.1); border: 1px solid rgba(240,165,0,0.4);
+  color: var(--accent2); padding: 10px 22px; border-radius: 30px;
+  font-weight: 600; font-size: 0.9rem; margin-bottom: 20px;
+}
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 20px;
+  font-size: 0.78rem; color: var(--soft);
+  z-index: 999; max-width: 300px; line-height: 1.5;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  animation: slideIn 0.3s ease;
+}
+.toast strong { color: var(--text); display: block; margin-bottom: 3px; }
+@keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { opacity: 1; } }
+
+/* ANIMATIONS */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; } }
+.fade-up { animation: fadeUp 0.35s ease forwards; }
+@keyframes popIn { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+
+/* RESPONSIVE */
+@media(max-width:600px) {
+  .word-jp { font-size: 2.4rem; }
+  .quiz-options { grid-template-columns: 1fr; }
+  .container { padding: 16px 12px; }
+  header { padding: 0 12px; }
+  .header-nav { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">日本語 <span>oral</span></div>
+  <nav class="header-nav">
+    <div class="hnav active" id="hnav-mots" onclick="setPage('mots')">Mots</div>
+    <div class="hnav" id="hnav-phrases" onclick="setPage('phrases')">Phrases</div>
+    <div class="hnav" id="hnav-vocab" onclick="setPage('vocab')">Vocabulaire</div>
+    <div class="hnav" id="hnav-quiz" onclick="setPage('quiz')">Quiz</div>
+  </nav>
+  <div class="header-right">
+    <div class="xp-chip">⭐ <span id="xpDisplay">0</span> XP</div>
+    <div class="streak" id="streakDisplay"></div>
+  </div>
+</header>
+
+<div class="page">
+  <div class="container" id="app"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast" style="display:none"></div>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────
+
+const WORDS = [
+  {
+    jp: "うさぎ", roma: "usagi", fr: "Lapin", cat: "Animaux",
+    phonetic: "ou-sa-gui",
+    syllables: [
+      { char:"う", roma:"u", tip:"'ou' court" },
+      { char:"さ", roma:"sa", tip:"'sa' net" },
+      { char:"ぎ", roma:"gi", tip:"'gui' doux" },
+    ],
+    pronunc: "Le 'u' initial est compressé, pas le 'ou' français. Le 'gi' se prononce 'gui' avec un G doux, jamais un J. Tout est régulier : 3 temps égaux.",
+    trap: "Ne dites pas « u-ZA-gi » — pas d'accent ! Chaque syllabe a le même poids : u·sa·gi."
+  },
+  {
+    jp: "ありがとう", roma: "arigatou", fr: "Merci", cat: "Expressions",
+    phonetic: "a-ri-ga-tou",
+    syllables: [
+      { char:"あ", roma:"a", tip:"'a' ouvert" },
+      { char:"り", roma:"ri", tip:"'ri' roulé" },
+      { char:"が", roma:"ga", tip:"'ga' doux" },
+      { char:"と", roma:"to", tip:"'to' net" },
+      { char:"う", roma:"u", tip:"long 'u'" },
+    ],
+    pronunc: "Le 'r' japonais (り) est unique : la langue frappe brièvement le palais, entre R et L. Le 'u' final s'allonge légèrement. Pas d'accent tonique.",
+    trap: "Les francophones accentuent souvent le « GA » — résistez ! a·ri·ga·to·u, régulier."
+  },
+  {
+    jp: "ねこ", roma: "neko", fr: "Chat", cat: "Animaux",
+    phonetic: "né-ko",
+    syllables: [
+      { char:"ね", roma:"ne", tip:"'né' net" },
+      { char:"こ", roma:"ko", tip:"'ko' bref" },
+    ],
+    pronunc: "Extrêmement simple ! 'né' comme dans 'nez', suivi de 'ko' bref. 2 temps égaux. C'est l'un des premiers mots à apprendre.",
+    trap: "Ne traînez pas sur le 'e' — ne dites pas « nééé-ko ». Court et vif."
+  },
+  {
+    jp: "さくら", roma: "sakura", fr: "Cerisier", cat: "Nature",
+    phonetic: "sa-kou-ra",
+    syllables: [
+      { char:"さ", roma:"sa", tip:"'sa' clair" },
+      { char:"く", roma:"ku", tip:"quasi-muet" },
+      { char:"ら", roma:"ra", tip:"R japonais" },
+    ],
+    pronunc: "Le 'ku' (く) est souvent quasi-muet entre consonnes — on entend surtout 'sa_ra'. Le 'ra' final utilise le R japonais : langue qui frappe le palais.",
+    trap: "Le 'ku' ne disparaît pas totalement mais s'efface. « Sak'ra » est plus proche que « sa-KOU-ra »."
+  },
+  {
+    jp: "でんしゃ", roma: "densha", fr: "Train", cat: "Transport",
+    phonetic: "den-cha",
+    syllables: [
+      { char:"で", roma:"de", tip:"'dé' net" },
+      { char:"ん", roma:"n", tip:"N tenu" },
+      { char:"し", roma:"shi", tip:"'chi' doux" },
+      { char:"ゃ", roma:"ya", tip:"fusion ya" },
+    ],
+    pronunc: "Le 'ん' (n) est une mora complète — tenez-le 1 temps entier avant de continuer. 'shi+ya' fusionne en 'sha'. On entend « den-sha » (4 moras).",
+    trap: "Ne sautez pas le 'n' ! « De-sha » est faux. Le N tenu dure autant qu'une syllabe."
+  },
+  {
+    jp: "おいしい", roma: "oishii", fr: "Délicieux", cat: "Expressions",
+    phonetic: "o-i-chi-i",
+    syllables: [
+      { char:"お", roma:"o", tip:"'o' rond" },
+      { char:"い", roma:"i", tip:"'i' net" },
+      { char:"し", roma:"shi", tip:"'chi'" },
+      { char:"い", roma:"i", tip:"long !" },
+    ],
+    pronunc: "Le dernier 'ii' est long — tenez-le 2 temps. C'est un adjectif ; la terminaison longue '-ii' est caractéristique. On l'entend clairement dans la langue.",
+    trap: "« oishi » (sans le ii final) sonnera tronqué. Allez jusqu'au bout : o·i·shi·iii~"
+  },
+  {
+    jp: "たべる", roma: "taberu", fr: "Manger", cat: "Verbes",
+    phonetic: "ta-bé-rou",
+    syllables: [
+      { char:"た", roma:"ta", tip:"'ta' net" },
+      { char:"べ", roma:"be", tip:"'bé' clair" },
+      { char:"る", roma:"ru", tip:"R+u fondu" },
+    ],
+    pronunc: "Forme dictionnaire. Le 'ru' final a un 'u' compressé, presque inaudible. On entend surtout « ta-bé-r' ». C'est un verbe en -ru (godan), courant.",
+    trap: "En parlant vite, le 'u' final disparaît quasi-totalement : « tabér' »."
+  },
+  {
+    jp: "みず", roma: "mizu", fr: "Eau", cat: "Nourriture",
+    phonetic: "mi-zou",
+    syllables: [
+      { char:"み", roma:"mi", tip:"'mi' clair" },
+      { char:"ず", roma:"zu", tip:"'zou' doux" },
+    ],
+    pronunc: "Le 'zu' se prononce 'zou' avec un Z doux, jamais un S. Court et net. Mot essentiel — retenez-le !",
+    trap: "Ne dites pas « mi-su » — c'est sourd. Le Z est sonore : mi·ZU."
+  },
+  {
+    jp: "きれい", roma: "kirei", fr: "Beau / Propre", cat: "Adjectifs",
+    phonetic: "ki-ré-i",
+    syllables: [
+      { char:"き", roma:"ki", tip:"'ki' net" },
+      { char:"れ", roma:"re", tip:"R japonais" },
+      { char:"い", roma:"i", tip:"'i' final" },
+    ],
+    pronunc: "Le 'rei' se décompose en 're' (R japonais + é) + 'i' distinctement. Ce n'est pas une diphtongue comme en anglais — chaque voyelle est articulée séparément.",
+    trap: "Ne fusionnez pas « rei » en un seul son. Deux moras : ré·i, pas « rèï »."
+  },
+  {
+    jp: "ともだち", roma: "tomodachi", fr: "Ami(e)", cat: "Personnes",
+    phonetic: "to-mo-da-tchi",
+    syllables: [
+      { char:"と", roma:"to", tip:"'to' net" },
+      { char:"も", roma:"mo", tip:"'mo' doux" },
+      { char:"だ", roma:"da", tip:"'da' clair" },
+      { char:"ち", roma:"chi", tip:"'tchi' !" },
+    ],
+    pronunc: "Le 'chi' final se prononce 'tchi', jamais 'ci' ou 'ki'. C'est le son de ち, toujours. Quatre moras réguliers.",
+    trap: "« tomo-DA-chi » — attention à ne pas accentuer le DA. Régulier : to·mo·da·chi."
+  },
+  {
+    jp: "しごと", roma: "shigoto", fr: "Travail", cat: "Quotidien",
+    phonetic: "chi-go-to",
+    syllables: [
+      { char:"し", roma:"shi", tip:"'chi'" },
+      { char:"ご", roma:"go", tip:"'go' doux" },
+      { char:"と", roma:"to", tip:"'to' net" },
+    ],
+    pronunc: "Le 'shi' (し) se prononce 'chi' avec un CH doux. Trois moras égaux. Mot très courant dans la vie japonaise.",
+    trap: "Ne dites pas « si-go-to » — le S de し est mouillé : shi/chi."
+  },
+  {
+    jp: "すきです", roma: "suki desu", fr: "J'aime (ça)", cat: "Expressions",
+    phonetic: "s'ki dès",
+    syllables: [
+      { char:"す", roma:"su", tip:"u muet" },
+      { char:"き", roma:"ki", tip:"'ki'" },
+      { char:"で", roma:"de", tip:"'dé'" },
+      { char:"す", roma:"su", tip:"u muet" },
+    ],
+    pronunc: "Les deux 'su' ont un 'u' quasi-muet. En pratique, on entend : « s'ki dès » — les deux U s'effacent entre consonnes sourdes. Très naturel !",
+    trap: "Si vous prononcez tous les U clairement, ça sonne étranger. Effacez-les : s'ki dès."
+  },
+];
+
+const SENTENCES = [
+  {
+    jp: "わたしは がくせい です",
+    phonetic: "wa-ta-chi wa ga-ku-sé des",
+    fr: "Je suis étudiant(e)",
+    parts: [
+      { word:"わたし", roma:"watashi", role:"sujet", label:"Sujet", explain:"Je / Moi" },
+      { word:"は", roma:"wa", role:"particule", label:"Particule", explain:"Marqueur de thème" },
+      { word:"がくせい", roma:"gakusei", role:"objet", label:"Attribut", explain:"étudiant(e)" },
+      { word:"です", roma:"desu", role:"verbe", label:"Copule", explain:"= 'est' (poli)" },
+    ],
+    rule: "Structure de base : <strong>Sujet は + Attribut + です</strong>. Le japonais met le verbe (ou la copule です) <strong>toujours à la fin</strong>.",
+    tip: "Le 'は' se prononce 'wa' (pas 'ha') quand c'est une particule ! Le 'u' de です s'efface : on dit « des »."
+  },
+  {
+    jp: "これは なに ですか",
+    phonetic: "ko-ré wa na-ni des ka",
+    fr: "Qu'est-ce que c'est ?",
+    parts: [
+      { word:"これ", roma:"kore", role:"sujet", label:"Sujet", explain:"Ceci / Ça" },
+      { word:"は", roma:"wa", role:"particule", label:"Particule", explain:"Marqueur de thème" },
+      { word:"なに", roma:"nani", role:"objet", label:"Question", explain:"Quoi / Qu'est-ce que" },
+      { word:"です", roma:"desu", role:"verbe", label:"Copule", explain:"est" },
+      { word:"か", roma:"ka", role:"fin", label:"Fin question", explain:"Marque la question" },
+    ],
+    rule: "Pour poser une question : ajoutez <strong>か</strong> à la fin. Pas besoin d'inversion ! Juste か après です → ですか",
+    tip: "か en fin de phrase = point d'interrogation oral. La voix monte légèrement sur です·KA."
+  },
+  {
+    jp: "わたしは すし が すきです",
+    phonetic: "wa-ta-chi wa s'chi ga s'ki des",
+    fr: "J'aime les sushis",
+    parts: [
+      { word:"わたしは", roma:"watashi wa", role:"sujet", label:"Sujet+part.", explain:"Moi (thème)" },
+      { word:"すし", roma:"sushi", role:"contexte", label:"Objet aimé", explain:"sushi" },
+      { word:"が", roma:"ga", role:"particule", label:"Particule", explain:"Marqueur de sujet (objet du sentiment)" },
+      { word:"すき", roma:"suki", role:"objet", label:"Sentiment", explain:"aimer" },
+      { word:"です", roma:"desu", role:"verbe", label:"Copule", explain:"(poli)" },
+    ],
+    rule: "Pour exprimer un goût : <strong>X が すきです</strong>. La particule が marque l'objet du sentiment. Pas de verbe 'aimer' — suki est un adjectif !",
+    tip: "すし et すき : les deux 'su' ont un U quasi-muet. On entend « s'chi ga s'ki des »."
+  },
+  {
+    jp: "どこへ いきますか",
+    phonetic: "do-ko é i-ki-mas ka",
+    fr: "Où allez-vous ?",
+    parts: [
+      { word:"どこ", roma:"doko", role:"contexte", label:"Lieu", explain:"Où (endroit)" },
+      { word:"へ", roma:"e", role:"particule", label:"Particule dir.", explain:"Vers (direction)" },
+      { word:"いきます", roma:"ikimasu", role:"verbe", label:"Verbe", explain:"aller (poli)" },
+      { word:"か", roma:"ka", role:"fin", label:"Question", explain:"?" },
+    ],
+    rule: "<strong>Lieu + へ + Verbe</strong> exprime la direction. La particule へ se prononce 'e' (pas 'hé') quand c'est une particule !",
+    tip: "いきます = aller (forme polie). Le 'u' de -masu s'efface : on dit « i-ki-mas »."
+  },
+  {
+    jp: "きのう えいが を みました",
+    phonetic: "ki-no-u é-ga o mi-ma-ch'ta",
+    fr: "Hier, j'ai regardé un film",
+    parts: [
+      { word:"きのう", roma:"kinou", role:"contexte", label:"Temps", explain:"Hier" },
+      { word:"えいが", roma:"eiga", role:"sujet", label:"Objet", explain:"film" },
+      { word:"を", roma:"o", role:"particule", label:"Particule obj.", explain:"Marque l'objet direct" },
+      { word:"みました", roma:"mimashita", role:"verbe", label:"Verbe (passé)", explain:"regardé (poli)" },
+    ],
+    rule: "<strong>Temps + Objet を + Verbe passé</strong>. La particule を (wo) se prononce juste 'o'. Le passé se forme : miru → mimashita.",
+    tip: "きのう (hier) se place naturellement au début — les marqueurs temporels viennent avant tout."
+  },
+  {
+    jp: "すみません、えき は どこ ですか",
+    phonetic: "s'mi-ma-sén, é-ki wa do-ko des ka",
+    fr: "Excusez-moi, où est la gare ?",
+    parts: [
+      { word:"すみません", roma:"sumimasen", role:"contexte", label:"Politesse", explain:"Excusez-moi" },
+      { word:"えき", roma:"eki", role:"sujet", label:"Thème", explain:"la gare" },
+      { word:"は", roma:"wa", role:"particule", label:"Particule", explain:"Marqueur de thème" },
+      { word:"どこ", roma:"doko", role:"objet", label:"Question", explain:"où" },
+      { word:"ですか", roma:"desu ka", role:"verbe", label:"Copule+?", explain:"est-il ?" },
+    ],
+    rule: "<strong>すみません</strong> en introduction, puis : <strong>Thème は + どこ + ですか</strong> = Où est [thème] ?",
+    tip: "すみません : le premier 'su' perd son U — on dit « s'mi-ma-sen ». Intonation : voix qui monte sur か."
+  },
+];
+
+const VOCAB_THEMES = {
+  "Animaux 🐾": [
+    { jp:"いぬ", roma:"inu", fr:"Chien", phonetic:"i-nou" },
+    { jp:"ねこ", roma:"neko", fr:"Chat", phonetic:"né-ko" },
+    { jp:"うさぎ", roma:"usagi", fr:"Lapin", phonetic:"ou-sa-gui" },
+    { jp:"とり", roma:"tori", fr:"Oiseau", phonetic:"to-ri" },
+    { jp:"さかな", roma:"sakana", fr:"Poisson", phonetic:"sa-ka-na" },
+    { jp:"うま", roma:"uma", fr:"Cheval", phonetic:"ou-ma" },
+    { jp:"くま", roma:"kuma", fr:"Ours", phonetic:"kou-ma" },
+    { jp:"さる", roma:"saru", fr:"Singe", phonetic:"sa-rou" },
+  ],
+  "Nourriture 🍜": [
+    { jp:"ごはん", roma:"gohan", fr:"Riz / repas", phonetic:"go-han" },
+    { jp:"みず", roma:"mizu", fr:"Eau", phonetic:"mi-zou" },
+    { jp:"パン", roma:"pan", fr:"Pain", phonetic:"pan" },
+    { jp:"たまご", roma:"tamago", fr:"Œuf", phonetic:"ta-ma-go" },
+    { jp:"にく", roma:"niku", fr:"Viande", phonetic:"ni-kou" },
+    { jp:"やさい", roma:"yasai", fr:"Légume", phonetic:"ya-sa-i" },
+    { jp:"くだもの", roma:"kudamono", fr:"Fruit", phonetic:"kou-da-mo-no" },
+    { jp:"おちゃ", roma:"ocha", fr:"Thé", phonetic:"o-tcha" },
+  ],
+  "Corps 🧍": [
+    { jp:"め", roma:"me", fr:"Œil", phonetic:"mé" },
+    { jp:"みみ", roma:"mimi", fr:"Oreille", phonetic:"mi-mi" },
+    { jp:"くち", roma:"kuchi", fr:"Bouche", phonetic:"kou-tchi" },
+    { jp:"はな", roma:"hana", fr:"Nez", phonetic:"ha-na" },
+    { jp:"て", roma:"te", fr:"Main", phonetic:"té" },
+    { jp:"あし", roma:"ashi", fr:"Pied / Jambe", phonetic:"a-chi" },
+    { jp:"あたま", roma:"atama", fr:"Tête", phonetic:"a-ta-ma" },
+    { jp:"こころ", roma:"kokoro", fr:"Cœur / Esprit", phonetic:"ko-ko-ro" },
+  ],
+  "Couleurs 🎨": [
+    { jp:"あか", roma:"aka", fr:"Rouge", phonetic:"a-ka" },
+    { jp:"あお", roma:"ao", fr:"Bleu / Vert", phonetic:"a-o" },
+    { jp:"しろ", roma:"shiro", fr:"Blanc", phonetic:"chi-ro" },
+    { jp:"くろ", roma:"kuro", fr:"Noir", phonetic:"kou-ro" },
+    { jp:"きいろ", roma:"kiiro", fr:"Jaune", phonetic:"ki-i-ro" },
+    { jp:"みどり", roma:"midori", fr:"Vert", phonetic:"mi-do-ri" },
+    { jp:"むらさき", roma:"murasaki", fr:"Violet", phonetic:"mou-ra-sa-ki" },
+    { jp:"ピンク", roma:"pinku", fr:"Rose", phonetic:"pin-kou" },
+  ],
+  "Verbes 🏃": [
+    { jp:"たべる", roma:"taberu", fr:"Manger", phonetic:"ta-bé-rou" },
+    { jp:"のむ", roma:"nomu", fr:"Boire", phonetic:"no-mou" },
+    { jp:"いく", roma:"iku", fr:"Aller", phonetic:"i-kou" },
+    { jp:"くる", roma:"kuru", fr:"Venir", phonetic:"kou-rou" },
+    { jp:"みる", roma:"miru", fr:"Voir / Regarder", phonetic:"mi-rou" },
+    { jp:"きく", roma:"kiku", fr:"Écouter / Entendre", phonetic:"ki-kou" },
+    { jp:"はなす", roma:"hanasu", fr:"Parler", phonetic:"ha-na-sou" },
+    { jp:"わかる", roma:"wakaru", fr:"Comprendre", phonetic:"wa-ka-rou" },
+  ],
+};
+
+// Build quiz from words
+function buildQuiz() {
+  return WORDS.map(w => ({
+    type: "meaning",
+    q: w.jp,
+    phonetic: w.phonetic,
+    ans: w.fr,
+    opts: shuffle([w.fr, ...WORDS.filter(x=>x.fr!==w.fr).map(x=>x.fr).slice(0,3)])
+  }));
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a.slice(0,4);
+}
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let state = {
+  page: 'mots',
+  wordIdx: 0,
+  sentIdx: 0,
+  vocabCat: Object.keys(VOCAB_THEMES)[0],
+  quizItems: [],
+  quizIdx: 0,
+  quizScore: 0,
+  quizResults: [],
+  xp: 0,
+  wordsDone: new Set(),
+};
+try {
+  const s = JSON.parse(localStorage.getItem('ngo2'));
+  if(s){ state.xp = s.xp||0; state.wordsDone = new Set(s.wordsDone||[]); }
+} catch(e){}
+
+function save() {
+  try { localStorage.setItem('ngo2', JSON.stringify({xp:state.xp, wordsDone:[...state.wordsDone]})); } catch(e){}
+}
+
+function addXP(n) {
+  state.xp += n; save();
+  document.getElementById('xpDisplay').textContent = state.xp;
+}
+
+// ─────────────────────────────────────────────
+// TTS
+// ─────────────────────────────────────────────
+const HAS_TTS = !!window.speechSynthesis;
+let voices = [];
+if(HAS_TTS) {
+  const loadVoices = () => { voices = window.speechSynthesis.getVoices(); };
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function speak(text, rate=1.0) {
+  if(!HAS_TTS) { showToast("🔇 Audio non disponible","Ouvrez ce fichier dans Chrome/Edge pour la voix japonaise."); return; }
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'ja-JP'; utt.rate = rate; utt.pitch = 1.05;
+  const jp = voices.find(v=>v.lang.startsWith('ja'));
+  if(jp) utt.voice = jp;
+  window.speechSynthesis.speak(utt);
+}
+
+function speakSyllable(char, idx) {
+  // Highlight syllable
+  document.querySelectorAll('.syllable').forEach((el,i)=>{
+    el.classList.toggle('playing', i===idx);
+  });
+  speak(char, 0.6);
+  setTimeout(()=>{ document.querySelectorAll('.syllable').forEach(el=>el.classList.remove('playing')); }, 800);
+}
+
+// ─────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────
+function showToast(title, msg) {
+  const t = document.getElementById('toast');
+  t.innerHTML = `<strong>${title}</strong>${msg}`;
+  t.style.display='block';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.style.display='none', 4000);
+}
+
+// ─────────────────────────────────────────────
+// ROUTING
+// ─────────────────────────────────────────────
+function setPage(p) {
+  state.page = p;
+  document.querySelectorAll('.hnav').forEach(el=>{
+    el.classList.toggle('active', el.id==='hnav-'+p);
+  });
+  if(p==='quiz') { state.quizItems=buildQuiz(); state.quizIdx=0; state.quizScore=0; state.quizResults=[]; }
+  render();
+}
+
+// ─────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────
+function render() {
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+  app.className = 'container fade-up';
+  if(state.page==='mots') renderMots(app);
+  else if(state.page==='phrases') renderPhrases(app);
+  else if(state.page==='vocab') renderVocab(app);
+  else if(state.page==='quiz') renderQuiz(app);
+}
+
+// ──────────── MOTS ────────────
+function renderMots(app) {
+  const w = WORDS[state.wordIdx];
+  const dots = WORDS.map((_,i)=>`<div class="dot ${i===state.wordIdx?'active':state.wordsDone.has(i)?'done':''}" onclick="goWord(${i})"></div>`).join('');
+
+  app.innerHTML = `
+  <div style="margin-bottom:12px;display:flex;align-items:center;gap:10px">
+    <div style="font-size:0.7rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase">Mot ${state.wordIdx+1} / ${WORDS.length}</div>
+    <div class="dot-row">${dots}</div>
+  </div>
+
+  <div class="word-card">
+    <div class="word-category">${w.cat}</div>
+    <div class="word-main">
+      <div class="word-jp">${w.jp}</div>
+      <div class="word-meaning">${w.fr}</div>
+    </div>
+
+    <!-- PHONETIC -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:6px">Prononciation française approximative</div>
+      <span class="phonetic">${w.phonetic}</span>
+    </div>
+
+    <!-- SYLLABLES -->
+    <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:10px">Cliquez sur chaque syllabe pour l'entendre</div>
+    <div class="syllable-row">
+      ${w.syllables.map((s,i)=>`
+      <div class="syllable" id="syl${i}" onclick="speakSyllable('${s.char}',${i})">
+        <div class="syl-char">${s.char}</div>
+        <div class="syl-roma">${s.roma}</div>
+        <div class="syl-tip">${s.tip}</div>
+      </div>`).join('')}
+    </div>
+
+    <!-- PRONUNC GUIDE -->
+    <div class="pronunc-block" style="margin-top:20px">
+      <div class="label">🎤 Comment prononcer</div>
+      <p>${w.pronunc}</p>
+    </div>
+    <div class="pronunc-block" style="border-left-color:var(--accent2)">
+      <div class="label" style="color:var(--accent2)">⚠️ Piège fréquent</div>
+      <p>${w.trap}</p>
+    </div>
+
+    <!-- AUDIO -->
+    <div class="audio-row">
+      <button class="btn btn-play" onclick="speak('${w.jp}',1.0)">▶ Écouter</button>
+      <button class="btn btn-slow" onclick="speak('${w.jp}',0.45)">🐢 Très lent</button>
+      <div class="speed-label">
+        Vitesse
+        <input type="range" min="30" max="150" value="100" id="speedSlider"
+          oninput="speak('${w.jp}',parseInt(this.value)/100)">
+      </div>
+    </div>
+  </div>
+
+  <!-- EXAMPLE IN SENTENCE -->
+  <div class="structure-card" style="padding:22px 28px">
+    <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:10px">Exemple dans une phrase</div>
+    <div class="sentence-jp" style="font-size:1.3rem">${getExampleSentence(w.jp, w.roma, w.fr)}</div>
+  </div>
+
+  <div class="word-nav">
+    <button class="nav-btn" onclick="prevWord()" ${state.wordIdx===0?'disabled':''}>← Précédent</button>
+    <button class="nav-btn primary" onclick="nextWord()">Suivant →</button>
+    <div class="word-counter">${state.wordsDone.size} / ${WORDS.length} maîtrisés</div>
+  </div>`;
+}
+
+function getExampleSentence(jp, roma, fr) {
+  const ex = {
+    "うさぎ": `<span style="color:var(--accent)">うさぎ</span>はかわいいです。<br><span style="color:var(--accent2);font-size:0.85rem;font-family:'Zen Kaku Gothic New',sans-serif">usagi wa kawaii desu</span><br><span style="color:var(--muted);font-size:0.78rem">Le lapin est mignon.</span>`,
+    "ありがとう": `<span style="color:var(--accent)">ありがとう</span>ございます！<br><span style="color:var(--accent2);font-size:0.85rem">arigatou gozaimasu</span><br><span style="color:var(--muted);font-size:0.78rem">Merci beaucoup !</span>`,
+    "ねこ": `<span style="color:var(--accent)">ねこ</span>がいます。<br><span style="color:var(--accent2);font-size:0.85rem">neko ga imasu</span><br><span style="color:var(--muted);font-size:0.78rem">Il y a un chat.</span>`,
+    "さくら": `<span style="color:var(--accent)">さくら</span>がきれいです。<br><span style="color:var(--accent2);font-size:0.85rem">sakura ga kirei desu</span><br><span style="color:var(--muted);font-size:0.78rem">Les cerisiers sont beaux.</span>`,
+    "でんしゃ": `<span style="color:var(--accent)">でんしゃ</span>できます。<br><span style="color:var(--accent2);font-size:0.85rem">densha de ikimasu</span><br><span style="color:var(--muted);font-size:0.78rem">J'y vais en train.</span>`,
+    "おいしい": `これは<span style="color:var(--accent)">おいしい</span>です！<br><span style="color:var(--accent2);font-size:0.85rem">kore wa oishii desu</span><br><span style="color:var(--muted);font-size:0.78rem">C'est délicieux !</span>`,
+    "たべる": `なにを<span style="color:var(--accent)">たべます</span>か？<br><span style="color:var(--accent2);font-size:0.85rem">nani wo tabemasu ka</span><br><span style="color:var(--muted);font-size:0.78rem">Qu'est-ce que tu manges ?</span>`,
+    "みず": `<span style="color:var(--accent)">みず</span>をください。<br><span style="color:var(--accent2);font-size:0.85rem">mizu wo kudasai</span><br><span style="color:var(--muted);font-size:0.78rem">De l'eau, s'il vous plaît.</span>`,
+    "きれい": `ほんとうに<span style="color:var(--accent)">きれい</span>ですね。<br><span style="color:var(--accent2);font-size:0.85rem">hontou ni kirei desu ne</span><br><span style="color:var(--muted);font-size:0.78rem">C'est vraiment beau, n'est-ce pas ?</span>`,
+    "ともだち": `<span style="color:var(--accent)">ともだち</span>とたべます。<br><span style="color:var(--accent2);font-size:0.85rem">tomodachi to tabemasu</span><br><span style="color:var(--muted);font-size:0.78rem">Je mange avec mon ami(e).</span>`,
+    "しごと": `<span style="color:var(--accent)">しごと</span>はたのしいです。<br><span style="color:var(--accent2);font-size:0.85rem">shigoto wa tanoshii desu</span><br><span style="color:var(--muted);font-size:0.78rem">Le travail est amusant.</span>`,
+    "すきです": `すしが<span style="color:var(--accent)">すきです</span>。<br><span style="color:var(--accent2);font-size:0.85rem">sushi ga suki desu</span><br><span style="color:var(--muted);font-size:0.78rem">J'aime les sushis.</span>`,
+  };
+  return ex[jp] || `<span style="color:var(--muted);font-size:0.85rem">Utilisez ce mot dans vos phrases !</span>`;
+}
+
+function goWord(i) { state.wordIdx=i; render(); }
+function prevWord() { if(state.wordIdx>0){state.wordIdx--;render();} }
+function nextWord() {
+  state.wordsDone.add(state.wordIdx);
+  addXP(5);
+  if(state.wordIdx<WORDS.length-1){state.wordIdx++;render();}
+  else { showToast("🎌 Bravo !","Tous les mots parcourus ! Faites le quiz pour valider."); }
+}
+
+// ──────────── PHRASES ────────────
+function renderPhrases(app) {
+  const s = SENTENCES[state.sentIdx];
+  const dots = SENTENCES.map((_,i)=>`<div class="dot ${i===state.sentIdx?'active':''}" onclick="goSent(${i})"></div>`).join('');
+
+  const blocks = s.parts.map(p=>`
+    <div class="struct-block">
+      <div class="struct-word role-${p.role}" onclick="speak('${p.word}',0.7)" title="Cliquez pour écouter">${p.word}</div>
+      <div class="struct-role role-${p.role}">${p.label}</div>
+    </div>
+  `).join('<div class="struct-arrow">·</div>');
+
+  const legend = [
+    {role:'sujet',color:'var(--blue)',label:'Sujet / Thème'},
+    {role:'particule',color:'var(--accent2)',label:'Particule'},
+    {role:'objet',color:'var(--green)',label:'Objet / Attribut'},
+    {role:'verbe',color:'var(--accent)',label:'Verbe / Copule'},
+    {role:'contexte',color:'var(--ruby)',label:'Contexte (temps, lieu)'},
+    {role:'fin',color:'var(--muted)',label:'Fin de phrase'},
+  ].map(l=>`<div class="legend-item"><div class="legend-dot" style="background:${l.color}"></div>${l.label}</div>`).join('');
+
+  app.innerHTML = `
+  <div style="margin-bottom:12px;display:flex;align-items:center;gap:10px">
+    <div style="font-size:0.7rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase">Structure ${state.sentIdx+1} / ${SENTENCES.length}</div>
+    <div class="dot-row">${dots}</div>
+  </div>
+
+  <div class="structure-card">
+    <div class="section-title">Structure des phrases</div>
+    <div class="section-sub">Cliquez sur chaque bloc pour entendre le mot. Le japonais met le verbe à la fin.</div>
+
+    <!-- SENTENCE -->
+    <div style="margin-bottom:20px">
+      <div class="sentence-jp" onclick="speak('${s.jp}',0.85)" style="cursor:pointer" title="Cliquer pour écouter">
+        ${s.jp}
+      </div>
+      <div class="sentence-phonetic">${s.phonetic}</div>
+      <div class="sentence-fr">${s.fr}</div>
+      <button class="btn btn-play" onclick="speak('${s.jp}',1.0)" style="margin-bottom:8px">▶ Écouter la phrase</button>
+      <button class="btn btn-slow" onclick="speak('${s.jp}',0.5)">🐢 Très lent</button>
+    </div>
+
+    <!-- DIAGRAM -->
+    <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:10px">Décomposition — cliquez sur un bloc</div>
+    <div class="struct-diagram">${blocks}</div>
+
+    <div class="struct-legend">${legend}</div>
+
+    <!-- EXPLANATION -->
+    <div class="struct-explain">
+      <strong>📐 Règle :</strong> ${s.rule}<br><br>
+      <strong>🎤 Oral :</strong> <span class="highlight">${s.tip}</span>
+    </div>
+
+    <!-- EACH WORD BREAKDOWN -->
+    <div style="margin-top:20px">
+      <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:12px">Chaque mot</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${s.parts.map(p=>`
+        <div style="display:flex;align-items:center;gap:14px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;cursor:pointer" onclick="speak('${p.word}',0.7)">
+          <div style="font-family:'Zen Kaku Gothic New',sans-serif;font-size:1.2rem;min-width:80px">${p.word}</div>
+          <div style="font-size:0.72rem;color:var(--accent2);min-width:80px;font-style:italic">${p.roma}</div>
+          <div style="font-size:0.75rem;color:var(--muted)">${p.explain}</div>
+          <div style="margin-left:auto;font-size:0.7rem;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--muted)">${p.label}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- KEY RULE BOX -->
+  <div style="background:rgba(232,97,58,0.08);border:1px solid rgba(232,97,58,0.25);border-radius:14px;padding:22px 26px;margin-bottom:20px">
+    <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:2px;color:var(--accent);margin-bottom:10px">⚡ Règle universelle du japonais oral</div>
+    <div style="font-size:0.85rem;color:var(--soft);line-height:1.8">
+      En japonais, l'ordre des mots est : <strong style="color:var(--text)">Contexte → Sujet → Objet → Verbe</strong><br>
+      Le verbe est <strong style="color:var(--accent)">toujours en dernier</strong>. Les particules (は, が, を, へ...) sont collées au mot qu'elles marquent et se prononcent différemment : は = <em style="color:var(--accent2)">wa</em>, へ = <em style="color:var(--accent2)">e</em>, を = <em style="color:var(--accent2)">o</em>.
+    </div>
+  </div>
+
+  <div class="word-nav">
+    <button class="nav-btn" onclick="prevSent()" ${state.sentIdx===0?'disabled':''}>← Précédente</button>
+    <button class="nav-btn primary" onclick="nextSent()">Suivante →</button>
+  </div>`;
+}
+
+function goSent(i) { state.sentIdx=i; addXP(2); render(); }
+function prevSent() { if(state.sentIdx>0){state.sentIdx--;render();} }
+function nextSent() {
+  addXP(8);
+  if(state.sentIdx<SENTENCES.length-1){state.sentIdx++;render();}
+  else { showToast("🎌 Bravo !","Toutes les structures vues ! Testez-vous en Quiz."); state.sentIdx=0; }
+}
+
+// ──────────── VOCAB ────────────
+function renderVocab(app) {
+  const cats = Object.keys(VOCAB_THEMES);
+  const items = VOCAB_THEMES[state.vocabCat];
+  const tabs = cats.map(c=>`<div class="cat-tab ${c===state.vocabCat?'active':''}" onclick="setVocabCat('${c}')">${c}</div>`).join('');
+
+  const cards = items.map((v,i)=>`
+    <div class="vocab-item" id="vi${i}" onclick="playVocab('${v.jp}',${i})">
+      <div class="play-icon">▶</div>
+      <div class="vocab-jp">${v.jp}</div>
+      <div class="vocab-roma">${v.roma}</div>
+      <div class="vocab-fr">${v.fr}</div>
+      <div class="vocab-phonetic">🗣 ${v.phonetic}</div>
+    </div>`).join('');
+
+  app.innerHTML = `
+  <div class="structure-card" style="margin-bottom:20px;padding:24px 28px">
+    <div class="section-title">Vocabulaire thématique</div>
+    <div class="section-sub">Cliquez sur un mot pour l'entendre. La phonétique approximative vous aide à démarrer.</div>
+  </div>
+  <div class="cat-tabs">${tabs}</div>
+  <div class="vocab-grid">${cards}</div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 24px">
+    <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:12px">💡 Astuce pour retenir</div>
+    <div style="font-size:0.82rem;color:var(--soft);line-height:1.7">
+      Répétez chaque mot <strong style="color:var(--text)">5 fois</strong> à voix haute après l'avoir écouté. Puis fermez les yeux et essayez de le prononcer seul. Le muscle de votre bouche doit s'habituer aux sons japonais — c'est purement physique !
+    </div>
+  </div>`;
+}
+
+function setVocabCat(c) { state.vocabCat=c; addXP(1); render(); }
+function playVocab(jp, idx) {
+  document.querySelectorAll('.vocab-item').forEach((el,i)=>el.classList.toggle('playing',i===idx));
+  speak(jp, 0.85);
+  setTimeout(()=>document.querySelectorAll('.vocab-item').forEach(el=>el.classList.remove('playing')), 1200);
+  addXP(1);
+}
+
+// ──────────── QUIZ ────────────
+function renderQuiz(app) {
+  const items = state.quizItems;
+  if(!items.length) { state.quizItems=buildQuiz(); state.quizIdx=0; state.quizScore=0; state.quizResults=[]; return render(); }
+
+  if(state.quizIdx >= items.length) { renderQuizEnd(app); return; }
+
+  const q = items[state.quizIdx];
+  const progress = items.map((_,i)=>{
+    const r = state.quizResults[i];
+    return `<div class="qp-dot ${i===state.quizIdx?'cur':r===true?'done-ok':r===false?'done-ko':''}"></div>`;
+  }).join('');
+
+  app.innerHTML = `
+  <div class="quiz-card">
+    <div class="quiz-q-label">Question ${state.quizIdx+1} / ${items.length} · Score ${state.quizScore}</div>
+    <div class="quiz-progress">${progress}</div>
+
+    <div style="font-size:0.72rem;color:var(--muted);margin-bottom:12px">Que signifie ce mot ?</div>
+    <div class="quiz-big" onclick="speak('${q.q}',0.8)" style="cursor:pointer" title="Cliquer pour écouter">${q.q}</div>
+    <div class="quiz-phonetic">${q.phonetic} — cliquez pour écouter</div>
+
+    <div class="quiz-options">
+      ${q.opts.map((o,i)=>`<div class="quiz-opt" id="qo${i}" onclick="answerQuiz(${i},'${o.replace(/'/g,"\\'")}','${q.ans.replace(/'/g,"\\'")}')">${o}</div>`).join('')}
+    </div>
+    <div class="quiz-feedback" id="qfeedback"></div>
+  </div>`;
+}
+
+function answerQuiz(idx, chosen, correct) {
+  document.querySelectorAll('.quiz-opt').forEach(el=>el.style.pointerEvents='none');
+  const ok = chosen===correct;
+  document.querySelectorAll('.quiz-opt').forEach((el,i)=>{
+    if(el.textContent.trim()===correct) el.classList.add('correct');
+    else if(i===idx && !ok) el.classList.add('wrong');
+  });
+  const fb = document.getElementById('qfeedback');
+  if(ok) {
+    fb.textContent='✅ Correct !'; fb.className='quiz-feedback ok';
+    state.quizScore++; state.quizResults.push(true); addXP(10);
+    speak(['せいかい！','そうです！','すごい！'][state.quizIdx%3], 1.0);
+  } else {
+    fb.textContent=`❌ C'était : ${correct}`; fb.className='quiz-feedback ko';
+    state.quizResults.push(false);
+  }
+  setTimeout(()=>{ state.quizIdx++; render(); }, 1500);
+}
+
+function renderQuizEnd(app) {
+  const total = state.quizItems.length;
+  const pct = Math.round((state.quizScore/total)*100);
+  const msg = pct>=90?'Excellent ! 🏆':pct>=70?'Très bien ! ⭐':pct>=50?'Pas mal ! 💪':'Continue à pratiquer ! 🌱';
+  app.innerHTML = `
+  <div class="quiz-card score-end">
+    <div class="big">${pct>=90?'🏆':pct>=70?'⭐':pct>=50?'💪':'🌱'}</div>
+    <h2>${msg}</h2>
+    <p>Score final : <strong>${state.quizScore} / ${total}</strong> (${pct}%)</p>
+    <div class="xp-badge">+${state.quizScore*10} XP gagnés</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="nav-btn primary" onclick="state.quizItems=buildQuiz();state.quizIdx=0;state.quizScore=0;state.quizResults=[];render()">🔄 Recommencer</button>
+      <button class="nav-btn" onclick="setPage('mots')">📖 Revoir les mots</button>
+    </div>
+  </div>`;
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+document.getElementById('xpDisplay').textContent = state.xp;
+render();
+</script>
+</body>
+</html>
